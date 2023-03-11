@@ -14,15 +14,16 @@ import (
 // inexhaustiveError is returned from check for each occurrence of inexhaustive
 // case analysis in a Go type switch statement.
 type inexhaustiveError struct {
-	Pos     token.Position
-	Def     sumTypeDef
-	Missing []types.Object
+	Position token.Position
+	Def      sumTypeDef
+	Missing  []types.Object
 }
 
+func (e inexhaustiveError) Pos() token.Position { return e.Position }
 func (e inexhaustiveError) Error() string {
 	return fmt.Sprintf(
-		"%s: exhaustiveness check failed for sum type '%s': missing cases for %s",
-		e.Pos, e.Def.Decl.TypeName, strings.Join(e.Names(), ", "))
+		"%s: exhaustiveness check failed for sum type %q (from %s): missing cases for %s",
+		e.Pos(), e.Def.Decl.TypeName, e.Def.Decl.Pos, strings.Join(e.Names(), ", "))
 }
 
 // Names returns a sorted list of names corresponding to the missing variant
@@ -70,9 +71,9 @@ func checkSwitch(
 	def, missing := missingVariantsInSwitch(pkg, defs, swtch)
 	if len(missing) > 0 {
 		return inexhaustiveError{
-			Pos:     pkg.Fset.Position(swtch.Pos()),
-			Def:     *def,
-			Missing: missing,
+			Position: pkg.Fset.Position(swtch.Pos()),
+			Def:      *def,
+			Missing:  missing,
 		}
 	}
 	return nil
