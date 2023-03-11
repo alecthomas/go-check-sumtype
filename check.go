@@ -32,7 +32,7 @@ func (e inexhaustiveError) Names() []string {
 	for _, o := range e.Missing {
 		list = append(list, o.Name())
 	}
-	sort.Sort(sort.StringSlice(list))
+	sort.Strings(list)
 	return list
 }
 

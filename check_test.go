@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/alecthomas/assert/v2"
 )
 
 // TestMissingOne tests that we detect a single missing variant.
@@ -11,8 +11,7 @@ func TestMissingOne(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T interface { sealed() }
 
 type A struct {}
@@ -31,9 +30,7 @@ func main() {
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	if !assert.Len(t, errs, 1) {
-		t.FailNow()
-	}
+	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
 
@@ -42,8 +39,7 @@ func TestMissingTwo(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T interface { sealed() }
 
 type A struct {}
@@ -65,9 +61,7 @@ func main() {
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	if !assert.Len(t, errs, 1) {
-		t.FailNow()
-	}
+	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B", "C"}, missingNames(t, errs[0]))
 }
 
@@ -77,8 +71,7 @@ func TestMissingOneWithPanic(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T interface { sealed() }
 
 type A struct {}
@@ -99,9 +92,7 @@ func main() {
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	if !assert.Len(t, errs, 1) {
-		t.FailNow()
-	}
+	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
 
@@ -110,8 +101,7 @@ func TestNoMissing(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T interface { sealed() }
 
 type A struct {}
@@ -133,7 +123,7 @@ func main() {
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	assert.Len(t, errs, 0)
+	assert.Equal(t, 0, len(errs))
 }
 
 // TestNoMissingDefault tests that even if we have a missing variant, a default
@@ -142,8 +132,7 @@ func TestNoMissingDefault(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T interface { sealed() }
 
 type A struct {}
@@ -164,7 +153,7 @@ func main() {
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	assert.Len(t, errs, 0)
+	assert.Equal(t, 0, len(errs))
 }
 
 // TestNotSealed tests that we report an error if one tries to declare a sum
@@ -173,8 +162,7 @@ func TestNotSealed(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T interface {}
 
 func main() {}
@@ -183,30 +171,8 @@ func main() {}
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	if !assert.Len(t, errs, 1) {
-		t.FailNow()
-	}
+	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, "T", errs[0].(unsealedError).Decl.TypeName)
-}
-
-// TestNotFound tests that we report an error if one tries to declare a sum
-// type that isn't defined.
-func TestNotFound(t *testing.T) {
-	code := `
-package main
-
-//go-sumtype:decl T
-
-func main() {}
-`
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
-
-	errs := run(pkgs)
-	if !assert.Len(t, errs, 1) {
-		t.FailNow()
-	}
-	assert.Equal(t, "T", errs[0].(notFoundError).Decl.TypeName)
 }
 
 // TestNotInterface tests that we report an error if one tries to declare a sum
@@ -215,8 +181,7 @@ func TestNotInterface(t *testing.T) {
 	code := `
 package main
 
-//go-sumtype:decl T
-
+//sumtype:decl
 type T struct {}
 
 func main() {}
@@ -225,15 +190,13 @@ func main() {}
 	defer teardownPackage(t, tmpdir)
 
 	errs := run(pkgs)
-	if !assert.Len(t, errs, 1) {
-		t.FailNow()
-	}
+	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, "T", errs[0].(notInterfaceError).Decl.TypeName)
 }
 
 func missingNames(t *testing.T, err error) []string {
-	if !assert.IsType(t, inexhaustiveError{}, err) {
-		t.FailNow()
-	}
-	return err.(inexhaustiveError).Names()
+	t.Helper()
+	ierr, ok := err.(inexhaustiveError)
+	assert.True(t, ok, "error was not inexhaustiveError: %T", err)
+	return ierr.Names()
 }

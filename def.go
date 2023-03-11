@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"go/ast"
 	"go/types"
 )
 
@@ -145,12 +144,4 @@ func indirect(ty types.Type) types.Type {
 		return indirect(ty.Elem())
 	}
 	return ty
-}
-
-func pkgFiles(pkg *ast.Package) []*ast.File {
-	var files []*ast.File
-	for _, file := range pkg.Files {
-		files = append(files, file)
-	}
-	return files
 }

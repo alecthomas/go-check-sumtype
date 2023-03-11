@@ -5,15 +5,13 @@ import (
 	"os"
 	"strings"
 
-	"golang.org/x/tools/go/loader"
 	"golang.org/x/tools/go/packages"
 )
 
 func main() {
 	log.SetFlags(0)
 	if len(os.Args) < 2 {
-		// TODO: Switch this to use golang.org/x/tools/go/packages.
-		log.Fatalf("Usage: go-sumtype <args>\n%s", loader.FromArgsUsage)
+		log.Fatalf("Usage: sumtype <packages>\n")
 	}
 	args := os.Args[1:]
 	pkgs, err := tycheckAll(args)
@@ -53,7 +51,8 @@ func run(pkgs []*packages.Package) []error {
 
 func tycheckAll(args []string) ([]*packages.Package, error) {
 	conf := &packages.Config{
-		Mode: packages.LoadSyntax,
+		Mode: packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedTypes | packages.NeedTypesSizes |
+			packages.NeedImports | packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles,
 		// Unfortunately, it appears including the test packages in
 		// this lint makes it difficult to do exhaustiveness checking.
 		// Namely, it appears that compiling the test version of a
