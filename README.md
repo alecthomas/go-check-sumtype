@@ -58,8 +58,7 @@ or not. If it's not, `go-check-sumtype` will report an error. For example, runni
 ```go
 package main
 
-//sumtype:decl MySumType
-
+//sumtype:decl
 type MySumType interface {
         sealed()
 }
@@ -111,7 +110,7 @@ cannot tell you whether case analysis over a sum type is complete or not.
 
 The `go-check-sumtype` command recognizes this pattern, but it needs a small amount
 of help to recognize which interfaces should be treated as sum types, which
-is why the `//sumtype:decl ...` annotation is required. `go-check-sumtype` will
+is why the `//sumtype:decl` annotation is required. `go-check-sumtype` will
 figure out all of the variants of a sum type by finding the set of types
 defined in the same package that satisfy the interface specified by the
 declaration.

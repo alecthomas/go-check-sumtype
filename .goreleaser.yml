@@ -16,7 +16,7 @@ builds:
     - "386"
   goarm:
     - "6"
-  main: .
+  main: ./cmd/go-check-sumtype
   binary: go-check-sumtype
 archives:
   -

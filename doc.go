@@ -7,14 +7,11 @@ either lacks a default clause or does not account for all possible variants.
 
 Declarations are provided in comments like so:
 
-	//sumtype:decl MySumType
+	//sumtype:decl
+	type MySumType interface { ... }
 
-MySumType must satisfy the following:
-
-	1. It is a type defined in the same package.
-	2. It is an interface.
-	3. It is *sealed*. That is, part of its interface definition contains an
-	   unexported method.
+MySumType must be *sealed*. That is, part of its interface definition contains
+an unexported method.
 
 sumtype will produce an error if any of the above is not true.
 
@@ -24,10 +21,9 @@ occurrences, it will attempt to detect whether the type switch is exhaustive
 or not. If it's not, sumtype will report an error. For example:
 
 	$ cat mysumtype.go
-	package main
+	package gochecksumtype
 
-	//sumtype:decl MySumType
-
+	//sumtype:decl
 	type MySumType interface {
 		sealed()
 	}
@@ -54,4 +50,4 @@ exhaustive checks to pass.
 As a special case, if the type switch statement contains a default clause
 that always panics, then exhaustiveness checks are still performed.
 */
-package main
+package gochecksumtype

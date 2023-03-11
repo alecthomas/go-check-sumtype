@@ -1,4 +1,4 @@
-package main
+package gochecksumtype
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 // TestMissingOne tests that we detect a single missing variant.
 func TestMissingOne(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T interface { sealed() }
@@ -29,7 +29,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
@@ -37,7 +37,7 @@ func main() {
 // TestMissingTwo tests that we detect a two missing variants.
 func TestMissingTwo(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T interface { sealed() }
@@ -60,7 +60,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B", "C"}, missingNames(t, errs[0]))
 }
@@ -69,7 +69,7 @@ func main() {
 // if we have a trivial default case that panics.
 func TestMissingOneWithPanic(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T interface { sealed() }
@@ -91,7 +91,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
@@ -99,7 +99,7 @@ func main() {
 // TestNoMissing tests that we correctly detect exhaustive case analysis.
 func TestNoMissing(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T interface { sealed() }
@@ -122,7 +122,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 0, len(errs))
 }
 
@@ -130,7 +130,7 @@ func main() {
 // case should thwart exhaustiveness checking.
 func TestNoMissingDefault(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T interface { sealed() }
@@ -152,7 +152,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 0, len(errs))
 }
 
@@ -160,7 +160,7 @@ func main() {
 // type with an unsealed interface.
 func TestNotSealed(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T interface {}
@@ -170,7 +170,7 @@ func main() {}
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, "T", errs[0].(unsealedError).Decl.TypeName)
 }
@@ -179,7 +179,7 @@ func main() {}
 // type that doesn't correspond to an interface.
 func TestNotInterface(t *testing.T) {
 	code := `
-package main
+package gochecksumtype
 
 //sumtype:decl
 type T struct {}
@@ -189,7 +189,7 @@ func main() {}
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := run(pkgs)
+	errs := Run(pkgs)
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, "T", errs[0].(notInterfaceError).Decl.TypeName)
 }

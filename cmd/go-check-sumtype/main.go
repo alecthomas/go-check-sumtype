@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	gochecksumtype "github.com/alecthomas/go-check-sumtype"
 	"golang.org/x/tools/go/packages"
 )
 
@@ -14,42 +15,7 @@ func main() {
 		log.Fatalf("Usage: sumtype <packages>\n")
 	}
 	args := os.Args[1:]
-	pkgs, err := tycheckAll(args)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if errs := run(pkgs); len(errs) > 0 {
-		var list []string
-		for _, err := range errs {
-			list = append(list, err.Error())
-		}
-		log.Fatal(strings.Join(list, "\n"))
-	}
-}
 
-func run(pkgs []*packages.Package) []error {
-	var errs []error
-
-	decls, err := findSumTypeDecls(pkgs)
-	if err != nil {
-		return []error{err}
-	}
-
-	defs, defErrs := findSumTypeDefs(decls)
-	errs = append(errs, defErrs...)
-	if len(defs) == 0 {
-		return errs
-	}
-
-	for _, pkg := range pkgs {
-		if pkgErrs := check(pkg, defs); pkgErrs != nil {
-			errs = append(errs, pkgErrs...)
-		}
-	}
-	return errs
-}
-
-func tycheckAll(args []string) ([]*packages.Package, error) {
 	conf := &packages.Config{
 		Mode: packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedTypes | packages.NeedTypesSizes |
 			packages.NeedImports | packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles,
@@ -67,7 +33,13 @@ func tycheckAll(args []string) ([]*packages.Package, error) {
 	}
 	pkgs, err := packages.Load(conf, args...)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
-	return pkgs, nil
+	if errs := gochecksumtype.Run(pkgs); len(errs) > 0 {
+		var list []string
+		for _, err := range errs {
+			list = append(list, err.Error())
+		}
+		log.Fatal(strings.Join(list, "\n"))
+	}
 }
