@@ -2,8 +2,15 @@ package gochecksumtype
 
 import (
 	"fmt"
+	"go/token"
 	"go/types"
 )
+
+// Error as returned by Run()
+type Error interface {
+	error
+	Pos() token.Position
+}
 
 // unsealedError corresponds to a declared sum type whose interface is not
 // sealed. A sealed interface requires at least one unexported method.
@@ -11,6 +18,7 @@ type unsealedError struct {
 	Decl sumTypeDecl
 }
 
+func (e unsealedError) Pos() token.Position { return e.Decl.Pos }
 func (e unsealedError) Error() string {
 	return fmt.Sprintf(
 		"%s: interface '%s' is not sealed "+
@@ -24,6 +32,7 @@ type notFoundError struct {
 	Decl sumTypeDecl
 }
 
+func (e notFoundError) Pos() token.Position { return e.Decl.Pos }
 func (e notFoundError) Error() string {
 	return fmt.Sprintf("%s: type '%s' is not defined", e.Decl.Location(), e.Decl.TypeName)
 }
@@ -34,6 +43,7 @@ type notInterfaceError struct {
 	Decl sumTypeDecl
 }
 
+func (e notInterfaceError) Pos() token.Position { return e.Decl.Pos }
 func (e notInterfaceError) Error() string {
 	return fmt.Sprintf("%s: type '%s' is not an interface", e.Decl.Location(), e.Decl.TypeName)
 }

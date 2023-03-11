@@ -1,8 +1,8 @@
 package gochecksumtype
 
 import (
-	"fmt"
 	"go/ast"
+	"go/token"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -14,15 +14,13 @@ type sumTypeDecl struct {
 	Package *packages.Package
 	// The type named by this decl.
 	TypeName string
-	// The file path where this declaration was found.
-	Path string
-	// The line number where this declaration was found.
-	Line int
+	// Position where the declaration was found.
+	Pos token.Position
 }
 
 // Location returns a short string describing where this declaration was found.
 func (d sumTypeDecl) Location() string {
-	return fmt.Sprintf("%s:%d", d.Path, d.Line)
+	return d.Pos.String()
 }
 
 // findSumTypeDecls searches every package given for sum type declarations of
@@ -54,15 +52,10 @@ func findSumTypeDecls(pkgs []*packages.Package) ([]sumTypeDecl, error) {
 					}
 					pos := pkg.Fset.Position(decl.Pos())
 					if tspec == nil {
-						retErr = notFoundError{Decl: sumTypeDecl{Package: pkg, Path: pos.Filename, Line: pos.Line}}
+						retErr = notFoundError{Decl: sumTypeDecl{Package: pkg, Pos: pos}}
 						return false
 					}
-					decl := sumTypeDecl{
-						Package:  pkg,
-						TypeName: tspec.Name.Name,
-						Path:     pos.Filename,
-						Line:     pos.Line,
-					}
+					decl := sumTypeDecl{Package: pkg, TypeName: tspec.Name.Name, Pos: pos}
 					decls = append(decls, decl)
 					break
 				}
