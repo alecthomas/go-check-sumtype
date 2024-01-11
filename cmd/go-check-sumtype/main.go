@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"os"
 	"strings"
@@ -11,7 +12,8 @@ import (
 
 func main() {
 	log.SetFlags(0)
-	if len(os.Args) < 2 {
+	flag.Parse()
+	if len(flag.Args()) < 1 {
 		log.Fatalf("Usage: sumtype <packages>\n")
 	}
 	args := os.Args[1:]
