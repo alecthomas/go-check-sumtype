@@ -12,11 +12,22 @@ import (
 
 func main() {
 	log.SetFlags(0)
+
+	defaultSignifiesExhaustive := flag.Bool(
+		"default-signifies-exhaustive",
+		true,
+		"Presence of \"default\" case in switch statements satisfies exhaustiveness, if all members are not listed.",
+	)
+
 	flag.Parse()
-	if len(flag.Args()) < 1 {
+	if flag.NArg() < 1 {
 		log.Fatalf("Usage: sumtype <packages>\n")
 	}
-	args := os.Args[1:]
+	args := os.Args[flag.NFlag()+1:]
+
+	config := gochecksumtype.Config{
+		DefaultSignifiesExhaustive: *defaultSignifiesExhaustive,
+	}
 
 	conf := &packages.Config{
 		Mode: packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedTypes | packages.NeedTypesSizes |
@@ -37,7 +48,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if errs := gochecksumtype.Run(pkgs); len(errs) > 0 {
+	if errs := gochecksumtype.Run(pkgs, config); len(errs) > 0 {
 		var list []string
 		for _, err := range errs {
 			list = append(list, err.Error())
