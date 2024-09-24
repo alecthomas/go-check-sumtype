@@ -29,12 +29,12 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
 
-// TestMissingTwo tests that we detect a two missing variants.
+// TestMissingTwo tests that we detect two missing variants.
 func TestMissingTwo(t *testing.T) {
 	code := `
 package gochecksumtype
@@ -60,7 +60,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B", "C"}, missingNames(t, errs[0]))
 }
@@ -91,7 +91,7 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
@@ -122,13 +122,13 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 0, len(errs))
 }
 
-// TestNoMissingDefault tests that even if we have a missing variant, a default
-// case should thwart exhaustiveness checking.
-func TestNoMissingDefault(t *testing.T) {
+// TestNoMissingDefaultWithDefaultSignifiesExhaustive tests that even if we have a missing variant, a default
+// case should thwart exhaustiveness checking when Config.DefaultSignifiesExhaustive is true.
+func TestNoMissingDefaultWithDefaultSignifiesExhaustive(t *testing.T) {
 	code := `
 package gochecksumtype
 
@@ -152,8 +152,39 @@ func main() {
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 0, len(errs))
+}
+
+// TestNoMissingDefaultAndDefaultDoesNotSignifiesExhaustive tests that even if we have a missing variant, a default
+// case should thwart exhaustiveness checking when Config.DefaultSignifiesExhaustive is false.
+func TestNoMissingDefaultAndDefaultDoesNotSignifiesExhaustive(t *testing.T) {
+	code := `
+package gochecksumtype
+
+//sumtype:decl
+type T interface { sealed() }
+
+type A struct {}
+func (a *A) sealed() {}
+
+type B struct {}
+func (b *B) sealed() {}
+
+func main() {
+	switch T(nil).(type) {
+	case *A:
+	default:
+		println("legit catch all goes here")
+	}
+}
+`
+	tmpdir, pkgs := setupPackages(t, code)
+	defer teardownPackage(t, tmpdir)
+
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: false})
+	assert.Equal(t, 1, len(errs))
+	assert.Equal(t, []string{"B"}, missingNames(t, errs[0]))
 }
 
 // TestNotSealed tests that we report an error if one tries to declare a sum
@@ -170,7 +201,7 @@ func main() {}
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, "T", errs[0].(unsealedError).Decl.TypeName)
 }
@@ -189,7 +220,7 @@ func main() {}
 	tmpdir, pkgs := setupPackages(t, code)
 	defer teardownPackage(t, tmpdir)
 
-	errs := Run(pkgs)
+	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
 	assert.Equal(t, "T", errs[0].(notInterfaceError).Decl.TypeName)
 }
