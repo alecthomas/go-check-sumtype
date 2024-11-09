@@ -29,7 +29,7 @@ func (e inexhaustiveError) Error() string {
 // Names returns a sorted list of names corresponding to the missing variant
 // cases.
 func (e inexhaustiveError) Names() []string {
-	var list []string
+	list := make([]string, 0, len(e.Missing))
 	for _, o := range e.Missing {
 		list = append(list, o.Name())
 	}
@@ -103,7 +103,7 @@ func missingVariantsInSwitch(
 		// A catch-all case defeats all exhaustiveness checks.
 		return def, nil
 	}
-	var variantTypes []types.Type
+	variantTypes := make([]types.Type, 0, len(variantExprs))
 	for _, expr := range variantExprs {
 		variantTypes = append(variantTypes, pkg.TypesInfo.TypeOf(expr))
 	}

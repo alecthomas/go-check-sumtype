@@ -71,7 +71,7 @@ type sumTypeDef struct {
 // sum type declarations. If no such sum type definition could be found for
 // any of the given declarations, then an error is returned.
 func findSumTypeDefs(decls []sumTypeDecl) ([]sumTypeDef, []error) {
-	var defs []sumTypeDef
+	defs := make([]sumTypeDef, 0, len(decls))
 	var errs []error
 	for _, decl := range decls {
 		def, err := newSumTypeDef(decl.Package.Types, decl)
@@ -104,7 +104,7 @@ func newSumTypeDef(pkg *types.Package, decl sumTypeDecl) (*sumTypeDef, error) {
 		return nil, notInterfaceError{decl}
 	}
 	hasUnexported := false
-	for i := 0; i < iface.NumMethods(); i++ {
+	for i := range iface.NumMethods() {
 		if !iface.Method(i).Exported() {
 			hasUnexported = true
 			break

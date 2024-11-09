@@ -15,7 +15,7 @@ func setupPackages(t *testing.T, code string) (string, []*packages.Package) {
 		t.Fatal(err)
 	}
 	srcPath := filepath.Join(tmpdir, "src.go")
-	if err := ioutil.WriteFile(srcPath, []byte(code), 0666); err != nil {
+	if err := ioutil.WriteFile(srcPath, []byte(code), 0600); err != nil {
 		t.Fatal(err)
 	}
 	pkgs, err := tycheckAll([]string{srcPath})
