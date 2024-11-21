@@ -1,7 +1,6 @@
 package gochecksumtype
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,26 +8,16 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-func setupPackages(t *testing.T, code string) (string, []*packages.Package) {
-	tmpdir, err := ioutil.TempDir("", "go-test-sumtype-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	srcPath := filepath.Join(tmpdir, "src.go")
-	if err := ioutil.WriteFile(srcPath, []byte(code), 0600); err != nil {
+func setupPackages(t *testing.T, code string) []*packages.Package {
+	srcPath := filepath.Join(t.TempDir(), "src.go")
+	if err := os.WriteFile(srcPath, []byte(code), 0600); err != nil {
 		t.Fatal(err)
 	}
 	pkgs, err := tycheckAll([]string{srcPath})
 	if err != nil {
 		t.Fatal(err)
 	}
-	return tmpdir, pkgs
-}
-
-func teardownPackage(t *testing.T, dir string) {
-	if err := os.RemoveAll(dir); err != nil {
-		t.Fatal(err)
-	}
+	return pkgs
 }
 
 func tycheckAll(args []string) ([]*packages.Package, error) {

@@ -26,8 +26,7 @@ func main() {
 	}
 }
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
@@ -57,8 +56,7 @@ func main() {
 	}
 }
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
@@ -88,8 +86,7 @@ func main() {
 	}
 }
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
@@ -119,8 +116,7 @@ func main() {
 	}
 }
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 0, len(errs))
@@ -149,8 +145,7 @@ func main() {
 	}
 }
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 0, len(errs))
@@ -179,8 +174,7 @@ func main() {
 	}
 }
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: false})
 	assert.Equal(t, 1, len(errs))
@@ -198,8 +192,7 @@ type T interface {}
 
 func main() {}
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
@@ -217,8 +210,7 @@ type T struct {}
 
 func main() {}
 `
-	tmpdir, pkgs := setupPackages(t, code)
-	defer teardownPackage(t, tmpdir)
+	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{DefaultSignifiesExhaustive: true})
 	assert.Equal(t, 1, len(errs))
