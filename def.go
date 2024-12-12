@@ -145,7 +145,7 @@ func (def *sumTypeDef) String() string {
 
 // missing returns a list of variants in this sum type that are not in the
 // given list of types.
-func (def *sumTypeDef) missing(tys []types.Type) []types.Object {
+func (def *sumTypeDef) missing(tys []types.Type, includeSharedInterfaces bool) []types.Object {
 	// TODO(ag): This is O(n^2). Fix that. /shrug
 	var missing []types.Object
 	for _, v := range def.Variants {
@@ -155,6 +155,11 @@ func (def *sumTypeDef) missing(tys []types.Type) []types.Object {
 			ty = indirect(ty)
 			if types.Identical(varty, ty) {
 				found = true
+				break
+			}
+			if includeSharedInterfaces && implements(varty, ty) {
+				found = true
+				break
 			}
 		}
 		if !found {
@@ -170,4 +175,12 @@ func indirect(ty types.Type) types.Type {
 		return indirect(ty.Elem())
 	}
 	return ty
+}
+
+func implements(varty, interfaceType types.Type) bool {
+	underlying := interfaceType.Underlying()
+	if interf, ok := underlying.(*types.Interface); ok {
+		return types.Implements(varty, interf) || types.Implements(types.NewPointer(varty), interf)
+	}
+	return false
 }

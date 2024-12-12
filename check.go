@@ -111,7 +111,7 @@ func missingVariantsInSwitch(
 	for _, expr := range variantExprs {
 		variantTypes = append(variantTypes, pkg.TypesInfo.TypeOf(expr))
 	}
-	return def, def.missing(variantTypes)
+	return def, def.missing(variantTypes, config.IncludeSharedInterfaces)
 }
 
 // switchVariants returns all case expressions found in a type switch. This

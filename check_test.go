@@ -217,6 +217,45 @@ func main() {}
 	assert.Equal(t, "T", errs[0].(notInterfaceError).Decl.TypeName)
 }
 
+// TestSharedInterface tests that if a shared interface is declared in the switch
+// statement, we don't report an error if structs that implement the interface are not explicitly
+// declared in the switch statement.
+func TestSharedInterface(t *testing.T) {
+	code := `
+package gochecksumtype
+
+//sumtype:decl
+type T1 interface { sealed1() }
+type T2 interface { 
+  T1
+  sealed2()
+}
+
+
+type A struct {}
+func (a *A) sealed1() {}
+
+type B struct {}
+func (b *B) sealed1() {}
+func (b *B) sealed2() {}
+
+type C struct {}
+func (c *C) sealed1() {}
+func (c *C) sealed2() {}
+
+func main() {
+	switch T1(nil).(type) {
+	case *A:
+	case T2:
+	}
+}
+`
+	pkgs := setupPackages(t, code)
+
+	errs := Run(pkgs, Config{IncludeSharedInterfaces: true})
+	assert.Equal(t, 0, len(errs))
+}
+
 func missingNames(t *testing.T, err error) []string {
 	t.Helper()
 	ierr, ok := err.(inexhaustiveError)
