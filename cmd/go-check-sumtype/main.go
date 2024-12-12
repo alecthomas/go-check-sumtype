@@ -19,6 +19,12 @@ func main() {
 		"Presence of \"default\" case in switch statements satisfies exhaustiveness, if all members are not listed.",
 	)
 
+	includeSharedInterfaces := flag.Bool(
+		"include-shared-interfaces",
+		false,
+		"Include shared interfaces in the exhaustiviness check.",
+	)
+
 	flag.Parse()
 	if flag.NArg() < 1 {
 		log.Fatalf("Usage: sumtype <packages>\n")
@@ -27,6 +33,7 @@ func main() {
 
 	config := gochecksumtype.Config{
 		DefaultSignifiesExhaustive: *defaultSignifiesExhaustive,
+		IncludeSharedInterfaces:    *includeSharedInterfaces,
 	}
 
 	conf := &packages.Config{

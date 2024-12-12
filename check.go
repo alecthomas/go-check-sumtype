@@ -92,6 +92,10 @@ func missingVariantsInSwitch(
 ) (*sumTypeDef, []types.Object) {
 	asserted := findTypeAssertExpr(swtch)
 	ty := pkg.TypesInfo.TypeOf(asserted)
+	if ty == nil {
+		panic(fmt.Sprintf("no type found for asserted expression: %v", asserted))
+	}
+
 	def := findDef(defs, ty)
 	if def == nil {
 		// We couldn't find a corresponding sum type, so there's
@@ -107,7 +111,7 @@ func missingVariantsInSwitch(
 	for _, expr := range variantExprs {
 		variantTypes = append(variantTypes, pkg.TypesInfo.TypeOf(expr))
 	}
-	return def, def.missing(variantTypes)
+	return def, def.missing(variantTypes, config.IncludeSharedInterfaces)
 }
 
 // switchVariants returns all case expressions found in a type switch. This
