@@ -217,10 +217,10 @@ func main() {}
 	assert.Equal(t, "T", errs[0].(notInterfaceError).Decl.TypeName)
 }
 
-// TestSharedInterface tests that if a shared interface is declared in the switch
+// TestSubTypeInSwitch tests that if a shared interface is declared in the switch
 // statement, we don't report an error if structs that implement the interface are not explicitly
 // declared in the switch statement.
-func TestSharedInterface(t *testing.T) {
+func TestSubTypeInSwitch(t *testing.T) {
 	code := `
 package gochecksumtype
 
@@ -253,6 +253,45 @@ func main() {
 	pkgs := setupPackages(t, code)
 
 	errs := Run(pkgs, Config{IncludeSharedInterfaces: true})
+	assert.Equal(t, 0, len(errs))
+}
+
+// TestAllLeavesInSwitch tests that we do not report an error if a switch statement
+// covers all leaves of the sum type, even if any SubTypes are not explicitly covered
+func TestAllLeavesInSwitch(t *testing.T) {
+	code := `
+package gochecksumtype
+
+//sumtype:decl
+type T1 interface { sealed1() }
+type T2 interface { 
+  T1
+  sealed2()
+}
+
+
+type A struct {}
+func (a *A) sealed1() {}
+
+type B struct {}
+func (b *B) sealed1() {}
+func (b *B) sealed2() {}
+
+type C struct {}
+func (c *C) sealed1() {}
+func (c *C) sealed2() {}
+
+func main() {
+	switch T1(nil).(type) {
+	case *A:
+	case *B:
+	case *C:
+	}
+}
+`
+	pkgs := setupPackages(t, code)
+
+	errs := Run(pkgs, Config{})
 	assert.Equal(t, 0, len(errs))
 }
 

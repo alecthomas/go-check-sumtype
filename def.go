@@ -162,11 +162,20 @@ func (def *sumTypeDef) missing(tys []types.Type, includeSharedInterfaces bool) [
 				break
 			}
 		}
-		if !found {
+		if !found && !isInterface(varty) {
+			// we do not include interfaces extending the sumtype, as the
+			// all implementations of those interfaces are already covered
+			// by the sumtype.
 			missing = append(missing, v)
 		}
 	}
 	return missing
+}
+
+func isInterface(ty types.Type) bool {
+	underlying := indirect(ty).Underlying()
+	_, ok := underlying.(*types.Interface)
+	return ok
 }
 
 // indirect dereferences through an arbitrary number of pointer types.
