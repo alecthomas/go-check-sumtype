@@ -1,8 +1,6 @@
 module github.com/alecthomas/go-check-sumtype
 
-go 1.23.0
-
-toolchain go1.23.3
+go 1.22.0
 
 require (
 	github.com/alecthomas/assert/v2 v2.11.0
@@ -14,5 +12,4 @@ require (
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/sync v0.9.0 // indirect
-	golang.org/x/sys v0.27.0 // indirect
 )
