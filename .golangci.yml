@@ -1,7 +1,5 @@
 run:
   tests: true
-  skip-dirs:
-    - _examples
 
 output:
   print-issued-lines: false
@@ -9,56 +7,53 @@ output:
 linters:
   enable-all: true
   disable:
-    - maligned
-    - megacheck
-    - lll
-    - gocyclo
-    - dupl
-    - gochecknoglobals
-    - funlen
-    - godox
-    - wsl
-    - gomnd
-    - gocognit
-    - goerr113
-    - nolintlint
-    - testpackage
-    - godot
-    - nestif
-    - paralleltest
-    - nlreturn
     - cyclop
-    - exhaustivestruct
-    - gci
-    - gofumpt
+    - depguard
+    - dupl
+    - dupword
+    - err113
     - errorlint
     - exhaustive
-    - ifshort
-    - wrapcheck
-    - stylecheck
-    - thelper
-    - nonamedreturns
-    - revive
-    - dupword
     - exhaustruct
-    - varnamelen
+    - exportloopref
     - forcetypeassert
-    - ireturn
-    - maintidx
-    - govet
-    - nosnakecase
-    - testableexamples
-    - musttag
-    - depguard
+    - funlen
+    - gci
+    - gochecknoglobals
+    - gocognit
     - goconst
-    - perfsprint
+    - gocyclo
+    - godot
+    - godox
+    - gofumpt
+    - govet
+    - ireturn
+    - lll
+    - maintidx
     - mnd
-    - predeclared
+    - mnd
+    - musttag
+    - nestif
     - nilnil
+    - nlreturn
+    - nolintlint
+    - nonamedreturns
+    - paralleltest
+    - perfsprint
+    - predeclared
+    - revive
+    - stylecheck
+    - testableexamples
+    - testpackage
+    - thelper
+    - varnamelen
+    - wrapcheck
+    - wsl
 
 linters-settings:
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   gocyclo:
     min-complexity: 10
   dupl:
@@ -67,14 +62,16 @@ linters-settings:
     min-len: 8
     min-occurrences: 3
   forbidigo:
+    exclude-godoc-examples: false
     #forbid:
     #  - (Must)?NewLexer$
-    exclude_godoc_examples: false
 
 issues:
-  max-per-linter: 0
-  max-same: 0
+  max-issues-per-linter: 0
+  max-same-issues: 0
   exclude-use-default: false
+  exclude-dirs:
+    - _examples
   exclude:
     # Captured by errcheck.
     - "^(G104|G204):"
