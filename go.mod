@@ -1,6 +1,6 @@
 module github.com/alecthomas/go-check-sumtype
 
-go 1.22.0
+go 1.24.0
 
 require (
 	github.com/alecthomas/assert/v2 v2.11.0
