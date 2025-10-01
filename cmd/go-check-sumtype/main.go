@@ -22,7 +22,7 @@ func main() {
 	includeSharedInterfaces := flag.Bool(
 		"include-shared-interfaces",
 		false,
-		"Include shared interfaces in the exhaustiviness check.",
+		"Include shared interfaces in the exhaustiveness check.",
 	)
 
 	flag.Parse()
