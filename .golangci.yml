@@ -58,43 +58,12 @@ linters:
       enable:
         - shadow
   exclusions:
-    generated: lax
-    rules:
-      - path: (.+)\.go$
-        text: '^(G104|G204):'
-      - path: (.+)\.go$
-        text: Error return value of .(.*\.Help|.*\.MarkFlagRequired|(os\.)?std(out|err)\..*|.*Close|.*Flush|os\.Remove(All)?|.*printf?|os\.(Un)?Setenv). is not checked
-      - path: (.+)\.go$
-        text: exported method (.*\.MarshalJSON|.*\.UnmarshalJSON|.*\.EntityURN|.*\.GoString|.*\.Pos) should have comment or be unexported
-      - path: (.+)\.go$
-        text: composite literal uses unkeyed fields
-      - path: (.+)\.go$
-        text: declaration of "err" shadows declaration
-      - path: (.+)\.go$
-        text: should not use dot imports
-      - path: (.+)\.go$
-        text: Potential file inclusion via variable
-      - path: (.+)\.go$
-        text: should have comment or be unexported
-      - path: (.+)\.go$
-        text: comment on exported var .* should be of the form
-      - path: (.+)\.go$
-        text: at least one file in a package should have a package comment
-      - path: (.+)\.go$
-        text: string literal contains the Unicode
-      - path: (.+)\.go$
-        text: methods on the same type should have the same receiver name
-      - path: (.+)\.go$
-        text: _TokenType_name should be _TokenTypeName
-      - path: (.+)\.go$
-        text: '`_TokenType_map` should be `_TokenTypeMap`'
-      - path: (.+)\.go$
-        text: rewrite if-else to switch statement
-    paths:
-      - _examples
-      - third_party$
-      - builtin$
-      - examples$
+    warn-unused: true
+    presets:
+      - std-error-handling
+      - common-false-positives
+      - comments
+
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
@@ -102,10 +71,3 @@ formatters:
   enable:
     - gofmt
     - goimports
-  exclusions:
-    generated: lax
-    paths:
-      - _examples
-      - third_party$
-      - builtin$
-      - examples$
